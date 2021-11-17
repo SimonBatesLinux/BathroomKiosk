@@ -26,4 +26,4 @@
 #    You should have received a copy of the GNU General Public License
 
 #    along with librepunch.  If not, see <https://www.gnu.org/licenses/>.
-librepunch -s
+startx -- -nocursor

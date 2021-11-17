@@ -33,4 +33,5 @@ echo Removing program files
 sudo rm -rf $HOME/.librepunch
 echo Removing auto start
 sudo rm /etc/profile.d/start_libre.sh
+sudo rm $HOME/.xinitrc
 echo "Uninstall complete"

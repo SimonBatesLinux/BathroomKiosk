@@ -50,4 +50,5 @@ cp .librepunch/help.txt $HOME/.librepunch
 #auto start application
 echo "setting application to auto start"
 sudo cp start_libre.sh /etc/profile.d
+sudo cp .xinitrc $HOME
 echo "Program installed, copy the ~/.librepunch direcory to backup librepunch"
