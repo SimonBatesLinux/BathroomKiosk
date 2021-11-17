@@ -1,0 +1,2 @@
+#!/bin/sh
+librepunch -s

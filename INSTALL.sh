@@ -1,3 +1,4 @@
+#/bin/sh
 
 #    librepunch  Copyright (C) 2021 Simon Bates
 
@@ -27,30 +28,26 @@
 
 #    along with librepunch.  If not, see <https://www.gnu.org/licenses/>.
 
-
-
-#!/bin/sh
-
-echo Installing prerequisites
-
+# dependencies
+echo "Installing dependencies"
 sudo apt upgrade zsh
 sudo apt upgrade python3
 sudo apt upgrade pip
 sudo pip install pygame
 
-echo prequisites installed
-echo install librepunch
-
+# install command
+echo "Installing command"
 sudo cp librepunch /bin/librepunch
-sudo chmod u=rwx /bin/librepunch
-sudo chmod g=rx /bin/librepunch
-sudo chmod o=rx /bin/librepunch
+sudo chmod u=rwx,g=rx,o=rx /bin/librepunch
 
-echo We suggest you backup $HOME/.librepunch/settings if you want to keep those settings
-read -rsp $'Press any key to continue...\n' -n 1 key
-
+# complete program files
+echo "Installing program files"
 mkdir -p $HOME/.librepunch/program_data 2> /dev/null
 cp .librepunch/main.py $HOME/.librepunch
 cp .librepunch/settings.py $HOME/.librepunch
 cp .librepunch/help.txt $HOME/.librepunch
-echo librepunch upgraded
+
+#auto start application
+echo "setting application to auto start"
+sudo cp start_libre.sh /etc/profile.d
+echo "Program installed, copy the ~/.librepunch direcory to backup librepunch"
