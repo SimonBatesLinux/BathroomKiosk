@@ -95,7 +95,6 @@ def handlePin(display, pin, Logged_Users, logger):
     if pin == "exit":
 
         # open management terminal
-        os.system("lxterminal -e zsh &")
         exit()
 
     elif pin == settings.ADMIN_PIN:
