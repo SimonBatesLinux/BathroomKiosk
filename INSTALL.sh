@@ -30,7 +30,6 @@
 
 # dependencies
 echo "Installing dependencies"
-sudo apt upgrade zsh
 sudo apt upgrade python3
 sudo apt upgrade pip
 sudo pip install pygame
