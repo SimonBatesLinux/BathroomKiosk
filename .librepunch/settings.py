@@ -19,11 +19,19 @@
     along with librepunch.  If not, see <https://www.gnu.org/licenses/>.
 
 """
+import hashlib
 
 # message outputs
 SCN_MSG = "Scan here:"
 LOG_MSG = "Logged In:"
 INV_PIN = "Invlid Pin.\n Please contact IT for assistance."
+
+# LOG OUTPUTS
+CLOCK_IN = "[%year%/%month%/%day%\t|\t%hour%:%minute%:%second%] - %username%:%user_pin% clocked in."
+CLOCK_OUT = "[%year%/%month%/%day%\t|\t%hour%:%minute%:%second%] - %username%:%user_pin% clocked out."
+SYSTEM_BOOT = "\t---\tprogram start on [%year%/%month%/%day%\t|\t%hour%:%minute%:%second%]\t---"
+SYSTEM_EXIT = "\t---\tprogram exit on [%year%/%month%/%day%\t|\t%hour%:%minute%:%second%]\t---"
+
 
 # program files
 USER_DATABASE = "program_data/user.dat"
@@ -52,4 +60,11 @@ MESSAGE_MARGIN = 0.05 # percent
 RESOLUTION = (0,0)
 
 # pin settings
-ADMIN_PIN = "123456789"
+ADMIN_PIN = "123456789" # pin used to sign out all users
+MANAGEMENT_PIN = "exit" # pin used to shutdown librepunch and manage a kiosk
+def PIN_HASHING_FCN(pin):
+    return pin
+    # use for pin hashing with sha3 512
+    # make sure to set admin and management pin with the -a and -A flags
+    # see man page for more
+    # return hashlib.sha3_512(pin.encode()).hexdigest()

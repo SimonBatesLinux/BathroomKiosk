@@ -1,3 +1,4 @@
+#!/bin/python3
 """
 
     librepunch  Copyright (C) 2021 Simon Bates
@@ -26,8 +27,47 @@ import shelve
 import pygame
 import os
 
+class logger:
+
+    logfile = "" # string // name of log file
+
+    def __init__(self, logfile):
+        ''' save logging settings '''
+        self.logfile = logfile
+
+    def addVars(self, string, varibles):
+        ''' add varibles to a string '''
+        arr = string.split('%')
+        i = 1
+        while i < len(arr):
+            if arr[i] in varibles:
+                arr[i] = varibles[arr[i]]
+            else:
+                arr[i] = "(NULL VARIABLE)"
+            i += 2
+        return ''.join(arr)
+
+    def log(self, logstring, varibles):
+        logString = self.addVars(logstring, varibles)
+        f = open(self.logfile, 'a')
+        f.write(logString + "\n")
+        f.close()
+
 # global varibles
 import settings
+
+def get_vars(start_vars = {}):
+    out = start_vars
+    cur = time.localtime()
+    out['year'] = str(cur.tm_year)
+    out['month'] = str(cur.tm_mon)
+    out['day'] = str(cur.tm_mday)
+    out['hour'] = str(cur.tm_hour)
+    out['minute'] = str(cur.tm_min)
+    out['second'] = str(cur.tm_sec)
+    return out
+
+
 
 def setFontSizes(w, h):
     titleFont = pygame.font.SysFont(settings.FONT_NAME, int(h * 0.0625))
@@ -36,20 +76,6 @@ def setFontSizes(w, h):
     loggedUsers = pygame.font.SysFont(settings.FONT_NAME, int(w * 0.03125))
     copyTxt     = pygame.font.SysFont(settings.FONT_NAME, int(w * 0.015))
     return titleFont, scanFont, loggedTitle, loggedUsers, copyTxt
-
-class logger:
-
-    def __init__(self):
-        if not os.path.isfile(settings.USER_LOG):
-            f = open(settings.USER_LOG, 'w')
-            f.write("")
-            f.close()
-
-    def log(self, log):
-        f = open(settings.USER_LOG, "a")
-        f.write(log + "\n")
-        f.close()
-
 
 def printd(display, message):
     upMessage = True
@@ -92,16 +118,15 @@ def printd(display, message):
 
 def handlePin(display, pin, Logged_Users, logger):
 
-    if pin == "exit":
+    if pin == settings.MANAGEMENT_PIN:
 
-        # open management terminal
+        logger.log(settings.SYSTEM_EXIT, get_vars())
+
         exit()
 
     elif pin == settings.ADMIN_PIN:
 
         # prepare to log out all users
-        cur = time.localtime()
-        curTime = str(cur.tm_mday) + "/" + str(cur.tm_mon) + "/" + str(cur.tm_year) + "   " + str(cur.tm_hour) + ":" + str(cur.tm_min) + ":" + str(cur.tm_sec)
         user_data = shelve.open(settings.USER_DATABASE)
 
 
@@ -109,7 +134,7 @@ def handlePin(display, pin, Logged_Users, logger):
         temp = list(Logged_Users.keys())
         for i in temp:
             del Logged_Users[i]
-            logger.log("[" + i + " : " + user_data[i] + "]: logged out at " + curTime + ".")
+            logger.log(settings.CLOCK_OUT, get_vars({"username" : user_data[i], "user_pin" : i}))
         
         printd(display, "Logged out all users")
 
@@ -118,17 +143,14 @@ def handlePin(display, pin, Logged_Users, logger):
         #check pin
         user_data = shelve.open(settings.USER_DATABASE)
         if pin in user_data.keys():
-            
-            cur = time.localtime()
-            curTime = str(cur.tm_mday) + "/" + str(cur.tm_mon) + "/" + str(cur.tm_year) + "   " + str(cur.tm_hour) + ":" + str(cur.tm_min) + ":" + str(cur.tm_sec)
-            
+
             if pin in Logged_Users.keys():
                 del Logged_Users[pin]
-                logger.log("[" + pin + " : " + user_data[pin] + "]: logged out at " + curTime + ".")
+                logger.log(settings.CLOCK_OUT, get_vars({"username" : user_data[pin], "user_pin" : pin}))
 
             else:
                 Logged_Users[pin] = user_data[pin]
-                logger.log("[" + pin + " : " + user_data[pin] + "]: logged in at " + curTime + ".")
+                logger.log(settings.CLOCK_IN, get_vars({"username" : user_data[pin], "user_pin" : pin}))
 
         else:
 
@@ -141,7 +163,9 @@ def mainLoop():
     pygame.init()
     display = pygame.display.set_mode(settings.RESOLUTION, pygame.FULLSCREEN)#, pygame.RESIZABLE)
     pygame.display.set_caption('librepunch')
-    log = logger()
+    log = logger(settings.USER_LOG)
+    log.log(settings.SYSTEM_BOOT, get_vars())
+
     
     Logged_Users = {}
 
@@ -163,7 +187,7 @@ def mainLoop():
 
                 # get user input
                 if event.key == pygame.K_RETURN:
-                    handlePin(display, pin, Logged_Users, log)
+                    handlePin(display, settings.PIN_HASHING_FCN(pin), Logged_Users, log)
                     pin = ''
 
                 else:
@@ -243,19 +267,20 @@ def editUsers():
         
         # check to see if the user already exists
         user_data = shelve.open(settings.USER_DATABASE)
-        if sys.argv[2] in user_data.keys():
+        pin = settings.PIN_HASHING_FCN(sys.argv[2])
+        if pin in user_data.keys():
             
             # change their name
-            print("changing username for " + sys.argv[2] + " to " + sys.argv[3] + ".")
-            user_data[sys.argv[2]] = sys.argv[3]
+            print("changing username for " + pin + " to " + sys.argv[3] + ".")
+            user_data[pin] = sys.argv[3]
             user_data.sync()
             print("complete")
 
         else:
             
             # add new user
-            print("Adding user " + sys.argv[2] + " : " + sys.argv[3] + ".")
-            user_data[sys.argv[2]] = sys.argv[3]
+            print("Adding user " + pin + " : " + sys.argv[3] + ".")
+            user_data[pin] = sys.argv[3]
             user_data.sync()
             print("complete")
 
@@ -273,8 +298,8 @@ def deleteUser():
     if len(sys.argv) == 3:
         # delete user
         user_data = shelve.open(settings.USER_DATABASE)
-        if sys.argv[2] in user_data.keys():
-            del user_data[sys.argv[2]]
+        if settings.PIN_HASHING_FCN(sys.argv[2]) in user_data.keys():
+            del user_data[settings.PIN_HASHING_FCN(sys.argv[2])]
             user_data.sync()
             print("User deleted")
         else:
@@ -286,15 +311,31 @@ def deleteUser():
     else:
 
         print("too few arguements")
-  
-def helpPage():
-    os.system("less help.txt")
 
+def chngSetPin(pin_name):
+    f = open("settings.py", 'r')
+    page = f.read().split("\n")
+    f.close()
+    for i in range(len(page)):
+        if pin_name in page[i].split("#")[0]:
+            page[i] = pin_name + " = \"" + str(settings.PIN_HASHING_FCN(sys.argv[2])) + "\""
+            if len(page[i].split("#")) > 1:
+                page[i] += page[i].split("#")[1]
+    content = '\n'.join(page)
+    f = open("settings.py", 'w')
+    f.write(content)
+    f.close()
+
+def chngAdmPin():
+    chngSetPin("ADMIN_PIN")
+
+def chngManPin():
+    chngSetPin("MANAGEMENT_PIN")
 
 def checkFlags():
 
     # native flag list for librepunch
-    flagList = {"-s" : mainLoop,"-l" : listUsers, "-n" : newDataBase, '-e' : editUsers, "-d" : deleteUser, "-h" : helpPage, "-?" : helpPage, "help" : helpPage}
+    flagList = {"-s" : mainLoop,"-l" : listUsers, "-n" : newDataBase, '-e' : editUsers, "-d" : deleteUser, '-a' : chngAdmPin, '-A' : chngManPin}
 
     if len(sys.argv) < 2:
 
