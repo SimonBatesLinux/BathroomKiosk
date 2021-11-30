@@ -1,4 +1,5 @@
-#!/bin/sh
+#/bin/sh
+
 #    librepunch  Copyright (C) 2021 Simon Bates
 
 #    This file is part of librepunch.
@@ -27,14 +28,21 @@
 
 #    along with librepunch.  If not, see <https://www.gnu.org/licenses/>.
 
-echo Removing start binary
-sudo rm /bin/librepunch
-echo Removing program files
-sudo rm -rf $HOME/.librepunch
-echo Removing Man Page
-sudo rm /usr/local/man/man1/librepunch.1
-sudo mandb
-echo Removing auto start
-sudo rm /etc/profile.d/start_libre.sh
-sudo rm $HOME/.xinitrc
-echo "Uninstall complete"
+# dependencies
+# install command
+echo "Installing command"
+sudo cp librepunch /bin/librepunch
+sudo chmod u=rwx,g=rx,o=rx /bin/librepunch
+
+# complete program files
+echo "Installing program files"
+mkdir -p $HOME/.librepunch/program_data 2> /dev/null
+cp .librepunch/main.py $HOME/.librepunch
+cp .librepunch/settings.py $HOME/.librepunch
+cp .librepunch/help.txt $HOME/.librepunch
+
+#auto start application
+echo "setting application to auto start"
+sudo cp start_libre.sh /etc/profile.d
+sudo cp .xinitrc $HOME
+echo "Program installed, copy the ~/.librepunch direcory to backup librepunch"

@@ -1,0 +1,55 @@
+
+.TH LIBREPUNCH 1 "30 November 2021"
+.SH NAME
+librepunch - time clocking interface
+
+.SH SYNOPSIS
+	librepunch [-option] [INPUTS]
+
+.SH DESCRIPTION
+	Librepunch is used as a time clocking system. It works by mapping a user_pin to a user_name that can than be typed out to handle user times.
+
+.SH OPTIONS	
+    -s
+        Start librepunch in graphical mode: "librepunch -s"
+
+    -n
+        Delete all users and start new data base: "librepunch -n"
+
+    -l
+        List all users: "librepunch -l"
+
+    -d
+        Delete a user: "librepunch -d <user_pin>"
+
+    -e
+        edit/add a user "librepunch -e <user_pin> <user_name>"
+
+    -a
+        to change the Admin pin "libepunch -a <admin_pin>"
+
+    -A
+        change the Administration pin "librepunch -A <adminstration_pin>"
+
+.SH NOTES
+	configuration file is ~/.librepunch/settings.py
+
+.SH AUTHORS
+	Simon Bates, <simonbatesbusiness@protonmail.com>
+
+.SH COPYRIGHT
+
+            librepunch  Copyright (C) 2021 Simon Bates
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.

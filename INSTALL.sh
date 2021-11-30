@@ -40,12 +40,19 @@ echo "Installing command"
 sudo cp librepunch /bin/librepunch
 sudo chmod u=rwx,g=rx,o=rx /bin/librepunch
 
+# install manpage
+sudo mkdir /usr/local/man/man1
+sudo cp librepunch.1 /usr/local/man/man1
+sudo mandb
+
 # complete program files
 echo "Installing program files"
 mkdir -p $HOME/.librepunch/program_data 2> /dev/null
 cp .librepunch/main.py $HOME/.librepunch
 cp .librepunch/settings.py $HOME/.librepunch
-cp .librepunch/help.txt $HOME/.librepunch
+
+# copy license file
+cp LICENSE.txt ~/.librepunch
 
 #auto start application
 echo "setting application to auto start"
